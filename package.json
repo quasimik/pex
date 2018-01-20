@@ -4,7 +4,6 @@
   "description": "pex",
   "main": "index.js",
   "dependencies": {
-    "iota.lib.js": "^0.4.6"
   },
   "devDependencies": {},
   "scripts": {
