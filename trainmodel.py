@@ -6,13 +6,13 @@ import json
 import math
 
 DATA_FILE_UP = 'data/pushup_up.json'
-DATA_FILE_DOWN = 'data/pushup_up.json'
+DATA_FILE_DOWN = 'data/pushup_down.json'
 NUM_FEATURES = 39
 
-with open(DATA_FILE_UP) as json_data:
-    data_up_instance_major = json.load(json_data)
-with open(DATA_FILE_DOWN) as json_data:
-    data_down_instance_major = json.load(json_data)
+with open(DATA_FILE_UP) as json_data_up:
+    data_up_instance_major = json.load(json_data_up)
+with open(DATA_FILE_DOWN) as json_data_down:
+    data_down_instance_major = json.load(json_data_down)
 
 data_len = len(data_up_instance_major) + len(data_down_instance_major)
 train_len = math.floor(0.8 * data_len) # 80% train, 20% eval
@@ -48,6 +48,9 @@ train_set = combined[:train_len]
 eval_set = combined[train_len:]
 
 # Split tuple, construct dict of {feature names : [arrays of features], ...}, construct list of labels
+# for key, val in train_set.items():
+#     print(key)
+#     print(len(val))
 features_train_arr, labels_train_arr = zip(*train_set)
 features_train_arr_zip = list(zip(*features_train_arr))
 features_train = {}
