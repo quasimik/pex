@@ -1,2 +1,8 @@
 venv
 *.pyc
+CMakeCache.txt
+cmake_install.cmake
+Makefile
+CMakeFiles
+*.bin
+data
