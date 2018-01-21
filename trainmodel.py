@@ -8,6 +8,7 @@ import math
 DATA_FILE_UP = 'data/pushup_up.json'
 DATA_FILE_DOWN = 'data/pushup_down.json'
 NUM_FEATURES = 39
+EXPORT_DIR = 'pushup_classifier_model'
 
 with open(DATA_FILE_UP) as json_data_up:
     data_up_instance_major = json.load(json_data_up)
@@ -92,3 +93,61 @@ eval_input_fn = tf.estimator.inputs.numpy_input_fn(
 
 eval_metrics = classifier.evaluate(input_fn=eval_input_fn)
 print("eval metrics: %r"% eval_metrics)
+
+# builder = tf.saved_model.builder.SavedModelBuilder(EXPORT_DIR)
+
+# with tf.Session(graph=tf.Graph()) as sess:
+#     builder.add_meta_graph_and_variables(sess, ["tag"])
+# builder.save()
+
+feature_spec = {'neck-x': tf.FixedLenFeature([0], tf.float32),
+                'neck-y': tf.FixedLenFeature([0], tf.float32),
+                'neck-c': tf.FixedLenFeature([0], tf.float32),
+                'right-shoulder-x': tf.FixedLenFeature([0], tf.float32),
+                'right-shoulder-y': tf.FixedLenFeature([0], tf.float32),
+                'right-shoulder-c': tf.FixedLenFeature([0], tf.float32),
+                'right-elbow-x': tf.FixedLenFeature([0], tf.float32),
+                'right-elbow-y': tf.FixedLenFeature([0], tf.float32),
+                'right-elbow-c': tf.FixedLenFeature([0], tf.float32),
+                'right-hand-x': tf.FixedLenFeature([0], tf.float32),
+                'right-hand-y': tf.FixedLenFeature([0], tf.float32),
+                'right-hand-c': tf.FixedLenFeature([0], tf.float32),
+                'left-shoulder-x': tf.FixedLenFeature([0], tf.float32),
+                'left-shoulder-y': tf.FixedLenFeature([0], tf.float32),
+                'left-shoulder-c': tf.FixedLenFeature([0], tf.float32),
+                'left-elbow-x': tf.FixedLenFeature([0], tf.float32),
+                'left-elbow-y': tf.FixedLenFeature([0], tf.float32),
+                'left-elbow-c': tf.FixedLenFeature([0], tf.float32),
+                'left-hand-x': tf.FixedLenFeature([0], tf.float32),
+                'left-hand-y': tf.FixedLenFeature([0], tf.float32),
+                'left-hand-c': tf.FixedLenFeature([0], tf.float32),
+                'right-hip-x': tf.FixedLenFeature([0], tf.float32),
+                'right-hip-y': tf.FixedLenFeature([0], tf.float32),
+                'right-hip-c': tf.FixedLenFeature([0], tf.float32),
+                'right-knee-x': tf.FixedLenFeature([0], tf.float32),
+                'right-knee-y': tf.FixedLenFeature([0], tf.float32),
+                'right-knee-c': tf.FixedLenFeature([0], tf.float32),
+                'right-foot-x': tf.FixedLenFeature([0], tf.float32),
+                'right-foot-y': tf.FixedLenFeature([0], tf.float32),
+                'right-foot-c': tf.FixedLenFeature([0], tf.float32),
+                'left-hip-x': tf.FixedLenFeature([0], tf.float32),
+                'left-hip-y': tf.FixedLenFeature([0], tf.float32),
+                'left-hip-c': tf.FixedLenFeature([0], tf.float32),
+                'left-knee-x': tf.FixedLenFeature([0], tf.float32),
+                'left-knee-y': tf.FixedLenFeature([0], tf.float32),
+                'left-knee-c': tf.FixedLenFeature([0], tf.float32),
+                'left-foot-x': tf.FixedLenFeature([0], tf.float32),
+                'left-foot-y': tf.FixedLenFeature([0], tf.float32),
+                'left-foot-c': tf.FixedLenFeature([0], tf.float32)}
+
+# sirf = tf.build_parsing_serving_input_receiver_fn(feature_spec)
+
+def serving_input_receiver_fn():
+    serialized_tf_example = tf.placeholder(dtype=tf.string,
+                                         shape=[128],
+                                         name='input_example_tensor')
+    receiver_tensors = {'examples': serialized_tf_example}
+    features = tf.parse_example(serialized_tf_example, feature_spec)
+    return tf.estimator.export.ServingInputReceiver(features, receiver_tensors)
+
+classifier.export_savedmodel(EXPORT_DIR, serving_input_receiver_fn)
